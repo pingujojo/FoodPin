@@ -75,53 +75,53 @@ class RestaurantTableViewController: UITableViewController {
         return cell
     }
     
-    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        
-        // 1. create an option as an action sheet.
-        // preferredStyle -> action sheet / alert
-        let optionMenu = UIAlertController(title: nil, message: "What do you want to do?", preferredStyle: .actionSheet)
-        
-        // 2. add actions to the menu.
-        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
-        optionMenu.addAction(cancelAction)
-        
-        // 2-1. add a custom action. to call a fake phone number. implement a handler first.
-        let callActionHandler = { (action:UIAlertAction!) -> Void in
-            let alertMessage = UIAlertController(title: "Server Unavailable", message: "Sorry, the call feature is not available yet. Please try later.", preferredStyle: .alert)
-            alertMessage.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-            self.present(alertMessage, animated: true, completion: nil)
-        }
-
-        // 2-2. add call action
-        let callAction = UIAlertAction(title: "Call " + "123-000-\(indexPath.row)", style: .default, handler: callActionHandler)
-        optionMenu.addAction(callAction)
-        
-        // 2-3. add another custom action. check-in action.
-        let checkInAction = UIAlertAction(title: "Check in", style: .default, handler:
-        {
-            (action:UIAlertAction!) -> Void in
-            
-            // ???
-            let cell = tableView.cellForRow(at: indexPath)
-            cell?.accessoryType = .checkmark
-            self.restaurantIsVisted[indexPath.row] = true
-        })
-        
-        // exercise: add an uncheck in option if cell has been checked.
-        let checkOutAction = UIAlertAction(title: "Undo Check in", style: .default, handler:
-        {
-            (action:UIAlertAction!) -> Void in
-            
-            let cell = tableView.cellForRow(at: indexPath)
-            cell?.accessoryType = .none
-            self.restaurantIsVisted[indexPath.row] = false
-        })
-        
-        self.restaurantIsVisted[indexPath.row] ? optionMenu.addAction(checkOutAction) : optionMenu.addAction(checkInAction)
-        
-        // 3. Display this menu
-        present(optionMenu, animated: true, completion: nil)
-    }
+//    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+//        
+//        // 1. create an option as an action sheet.
+//        // preferredStyle -> action sheet / alert
+//        let optionMenu = UIAlertController(title: nil, message: "What do you want to do?", preferredStyle: .actionSheet)
+//        
+//        // 2. add actions to the menu.
+//        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+//        optionMenu.addAction(cancelAction)
+//        
+//        // 2-1. add a custom action. to call a fake phone number. implement a handler first.
+//        let callActionHandler = { (action:UIAlertAction!) -> Void in
+//            let alertMessage = UIAlertController(title: "Server Unavailable", message: "Sorry, the call feature is not available yet. Please try later.", preferredStyle: .alert)
+//            alertMessage.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+//            self.present(alertMessage, animated: true, completion: nil)
+//        }
+//
+//        // 2-2. add call action
+//        let callAction = UIAlertAction(title: "Call " + "123-000-\(indexPath.row)", style: .default, handler: callActionHandler)
+//        optionMenu.addAction(callAction)
+//        
+//        // 2-3. add another custom action. check-in action.
+//        let checkInAction = UIAlertAction(title: "Check in", style: .default, handler:
+//        {
+//            (action:UIAlertAction!) -> Void in
+//            
+//            // ???
+//            let cell = tableView.cellForRow(at: indexPath)
+//            cell?.accessoryType = .checkmark
+//            self.restaurantIsVisted[indexPath.row] = true
+//        })
+//        
+//        // exercise: add an uncheck in option if cell has been checked.
+//        let checkOutAction = UIAlertAction(title: "Undo Check in", style: .default, handler:
+//        {
+//            (action:UIAlertAction!) -> Void in
+//            
+//            let cell = tableView.cellForRow(at: indexPath)
+//            cell?.accessoryType = .none
+//            self.restaurantIsVisted[indexPath.row] = false
+//        })
+//        
+//        self.restaurantIsVisted[indexPath.row] ? optionMenu.addAction(checkOutAction) : optionMenu.addAction(checkInAction)
+//        
+//        // 3. Display this menu
+//        present(optionMenu, animated: true, completion: nil)
+//    }
 
     /*
     // Override to support conditional editing of the table view.
@@ -130,18 +130,63 @@ class RestaurantTableViewController: UITableViewController {
         return true
     }
     */
-
     /*
     // Override to support editing the table view.
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             // Delete the row from the data source
-            tableView.deleteRows(at: [indexPath], with: .fade)
+            restaurantNames.remove(at: indexPath.row)
+            restaurantLocations.remove(at: indexPath.row)
+            restaurantTypes.remove(at: indexPath.row)
+            restaurantImages.remove(at: indexPath.row)
+            restaurantIsVisted.remove(at: indexPath.row)
         } else if editingStyle == .insert {
             // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
+        }
+        
+        //tableView.reloadData()
+        tableView.deleteRows(at: [indexPath], with: .fade)
+        
+        print("Total items: \(restaurantNames.count)")
+        for name in restaurantNames {
+            print(name)
+        }
+    }*/
+    
+    // to handle more swipe in row actions
+    override func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
+        // 1. add a social sharing button
+        let shareAction = UITableViewRowAction(style: .default, title: "Share", handler:
+        {
+            (action, indexPath) -> Void in
+            let defaultText = "Just checking in at " + self.restaurantNames[indexPath.row]
+            
+            if let imageToShare = UIImage(named: self.restaurantImages[indexPath.row]) {
+                let activityController = UIActivityViewController(activityItems: [defaultText, imageToShare], applicationActivities: nil)
+                self.present(activityController, animated: true, completion: nil)
+            }
+        })
+        
+        // 2. add delete button
+        let deleteAction = UITableViewRowAction(style: .default, title: "Delete", handler:
+        {
+            (action, indexPath) -> Void in
+            
+            // delete data
+            self.restaurantNames.remove(at: indexPath.row)
+            self.restaurantLocations.remove(at: indexPath.row)
+            self.restaurantTypes.remove(at: indexPath.row)
+            self.restaurantImages.remove(at: indexPath.row)
+            self.restaurantIsVisted.remove(at: indexPath.row)
+            
+            self.tableView.deleteRows(at: [indexPath], with: .fade)
+        })
+        
+        shareAction.backgroundColor = UIColor(red: 48.0/255.0, green: 173.0/255.0, blue: 99.0/255.0, alpha: 1.0)
+        deleteAction.backgroundColor = UIColor.red
+        
+        return [shareAction, deleteAction]
     }
-    */
 
     /*
     // Override to support rearranging the table view.
@@ -158,14 +203,24 @@ class RestaurantTableViewController: UITableViewController {
     }
     */
 
-    /*
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // Get the new view controller using segue.destinationViewController.
         // Pass the selected object to the new view controller.
+        if segue.identifier == "showRestaurantDetail" {
+            if let indexPath = tableView.indexPathForSelectedRow {
+                // destination of this segue is "Detail View Controller"
+                let destinationController = segue.destination as! RestaurantDetailViewController
+                // pass data to destination view controller
+                destinationController.restaurantImage = restaurantImages[indexPath.row]
+                destinationController.restaurantName = restaurantNames[indexPath.row]
+                destinationController.restaurantLocation = restaurantLocations[indexPath.row]
+                destinationController.restaurantType = restaurantTypes[indexPath.row]
+//                destinationController.restaurantTypeLabel.text = restaurantTypes[indexPath.row]
+            }
+        }
     }
-    */
 
 }
