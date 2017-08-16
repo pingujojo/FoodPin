@@ -8,26 +8,42 @@
 
 import UIKit
 
-class RestaurantDetailViewController: UIViewController {
+class RestaurantDetailViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
 
     @IBOutlet weak var restaurantImageView: UIImageView!
-    var restaurantImage = ""
-    @IBOutlet weak var restaurantNameLabel: UILabel!
-    var restaurantName = ""
-    @IBOutlet weak var restaurantTypeLabel: UILabel!
-    var restaurantType = ""
-    @IBOutlet weak var restaurantLocationLabel: UILabel!
-    var restaurantLocation = ""
+    @IBOutlet var tableview:UITableView!
+
+    var restaurant: Restaurant!
+    //var restaurantImageName = ""
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
-        restaurantImageView.image = UIImage(named: restaurantImage)
-        restaurantNameLabel.text = restaurantName
-        restaurantLocationLabel.text = restaurantLocation
-        restaurantTypeLabel.text = restaurantType
-        //restaurantName
+        //if restaurant.image != nil {
+        restaurantImageView.image = UIImage(named: restaurant.image)
+        tableview.backgroundColor = UIColor(red: 240.0/255.0, green: 240.0/255.0, blue: 240.0/255.0, alpha: 0.2)
+        tableview.tableFooterView = UIView(frame: CGRect.zero)
+        tableview.separatorColor = UIColor(red: 240.0/255.0, green: 240.0/255.0, blue: 240.0/255.0, alpha: 0.8)
+        
+        title = restaurant.name
+        navigationController?.hidesBarsOnSwipe = false
+
+        //}
+//        restaurantNameLabel.text = restaurant.name
+//        restaurantLocationLabel.text = restaurant.location
+//        restaurantTypeLabel.text = restaurant.type
+//        //restaurantName
+    }
+    
+    // override "veiewWillAppear"
+    // called when a view is about to display.
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        // set to false because we don't need hide it at detail view.
+        navigationController?.hidesBarsOnSwipe = false
+        navigationController?.setNavigationBarHidden(false, animated: true)
     }
 
     override func didReceiveMemoryWarning() {
@@ -35,6 +51,37 @@ class RestaurantDetailViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return 4 // hard code?
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! RestaurantDetailTableViewCell
+        
+        // config cell
+        switch indexPath.row {
+        case 0:
+            cell.fieldLabel.text = "Name"
+            cell.valueLabel.text = restaurant.name
+        case 1:
+            cell.fieldLabel.text = "Type"
+            cell.valueLabel.text = restaurant.type
+        case 2:
+            cell.fieldLabel.text = "Location"
+            cell.valueLabel.text = restaurant.location
+        case 3:
+            cell.fieldLabel.text = "Been here"
+            cell.valueLabel.text = (restaurant.isVisited) ? "Yes, I've been here before" : "No"
+        default:
+            cell.fieldLabel.text = ""
+            cell.valueLabel.text = ""
+        }
+        
+        // config cell
+        cell.backgroundColor = UIColor.clear
+        
+        return cell
+    }
 
     /*
     // MARK: - Navigation
