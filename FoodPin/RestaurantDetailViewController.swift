@@ -12,6 +12,31 @@ class RestaurantDetailViewController: UIViewController, UITableViewDataSource, U
 
     @IBOutlet weak var restaurantImageView: UIImageView!
     @IBOutlet var tableview:UITableView!
+    
+    // to unwind segue (but no one fill the spot?) <- Yes, we connect it with a close segue connection in Interface Builder
+    @IBAction func close(segue:UIStoryboardSegue) {
+    
+    }
+    
+    @IBAction func ratingButtonTapped(segue:UIStoryboardSegue) {
+        
+        if let rating = segue.identifier {
+            restaurant.isVisited = true
+            
+            switch rating {
+            case "great":
+                restaurant.rating = "Absolutely!"
+            case "good":
+                restaurant.rating = "Pretty Good."
+            case "dislike":
+                restaurant.rating = "Dislike"
+            default:
+                break
+            }
+        }
+        
+        tableview.reloadData() // reload data!! inform view to change items to display
+    }
 
     var restaurant: Restaurant!
     //var restaurantImageName = ""
@@ -25,6 +50,10 @@ class RestaurantDetailViewController: UIViewController, UITableViewDataSource, U
         tableview.backgroundColor = UIColor(red: 240.0/255.0, green: 240.0/255.0, blue: 240.0/255.0, alpha: 0.2)
         tableview.tableFooterView = UIView(frame: CGRect.zero)
         tableview.separatorColor = UIColor(red: 240.0/255.0, green: 240.0/255.0, blue: 240.0/255.0, alpha: 0.8)
+        
+        // Enable self sizing cell.
+        tableview.estimatedRowHeight = 36.0 // estimated row height
+        tableview.rowHeight = UITableViewAutomaticDimension // change property of rowheight to Auto dimension
         
         title = restaurant.name
         navigationController?.hidesBarsOnSwipe = false
@@ -71,7 +100,7 @@ class RestaurantDetailViewController: UIViewController, UITableViewDataSource, U
             cell.valueLabel.text = restaurant.location
         case 3:
             cell.fieldLabel.text = "Been here"
-            cell.valueLabel.text = (restaurant.isVisited) ? "Yes, I've been here before" : "No"
+            cell.valueLabel.text = (restaurant.isVisited) ? "Yes, I've been here before. \(restaurant.rating)" : "No"
         default:
             cell.fieldLabel.text = ""
             cell.valueLabel.text = ""
@@ -83,14 +112,18 @@ class RestaurantDetailViewController: UIViewController, UITableViewDataSource, U
         return cell
     }
 
-    /*
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // Get the new view controller using segue.destinationViewController.
         // Pass the selected object to the new view controller.
+        
+        if segue.identifier == "showReview" {
+            let destinationController = segue.destination as! ReviewViewController
+            destinationController.restaurantImageName = restaurant.image
+        }
     }
-    */
+
 
 }
